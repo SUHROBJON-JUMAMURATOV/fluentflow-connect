@@ -197,4 +197,8 @@ export const translations = {
   },
 } as const;
 
-export type TranslationShape = typeof translations.uz;
+type DeepReadonlyToMutable<T> = T extends string
+  ? string
+  : { -readonly [K in keyof T]: DeepReadonlyToMutable<T[K]> };
+
+export type TranslationShape = DeepReadonlyToMutable<typeof translations.uz>;
