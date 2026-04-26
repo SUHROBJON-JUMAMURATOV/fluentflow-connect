@@ -10,10 +10,10 @@ export function Footer() {
           <span className="grid h-7 w-7 place-items-center rounded-lg gradient-hero">
             <Wrench className="h-4 w-4 text-primary-foreground" />
           </span>
-          <span className="text-sm font-semibold">PlumbingPro</span>
+          <span className="text-sm font-semibold">SANTEXNIKA UZ</span>
         </div>
         <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} PlumbingPro — {t.footer}
+          © {new Date().getFullYear()} SANTEXNIKA UZ — {t.footer}
         </p>
       </div>
     </footer>

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageContext";
 import { Phone, Sparkles } from "lucide-react";
 
-const PHONE_TEL = "+998901234567";
+const PHONE_TEL = "+998200003916";
 
 export function Hero() {
   const { t } = useLang();
