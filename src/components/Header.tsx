@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
-const PHONE = "+998 90 123 45 67";
-const PHONE_TEL = "+998901234567";
+const PHONE = "+998 20 000 39 16";
+const PHONE_TEL = "+998200003916";
 
 export function Header() {
   const { t } = useLang();
@@ -21,7 +21,7 @@ export function Header() {
             <Wrench className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
           </span>
           <span className="text-lg font-bold tracking-tight">
-            Plumbing<span className="text-primary">Pro</span>
+            SANTEXNIKA<span className="text-primary"> UZ</span>
           </span>
         </a>
 

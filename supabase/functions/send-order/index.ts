@@ -1,3 +1,6 @@
+const MAKE_WEBHOOK_URL =
+  "https://hook.eu1.make.com/n0m7u88ll0omycxzjbon2t6iak6ooxpt";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -5,24 +8,12 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const escapeHtml = (s: string) =>
-  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN");
-    const CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID");
-
-    if (!BOT_TOKEN || !CHAT_ID) {
-      return new Response(JSON.stringify({ error: "Telegram is not configured" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const body = await req.json();
     const name = (body.name ?? "").toString().trim();
     const phone = (body.phone ?? "").toString().trim();
@@ -48,25 +39,23 @@ Deno.serve(async (req) => {
 
     const now = new Date().toLocaleString("ru-RU", { timeZone: "Asia/Tashkent" });
 
-    const text =
-      `🛠 <b>NEW ORDER / НОВЫЙ ЗАКАЗ / YANGI BUYURTMA</b>\n\n` +
-      `👤 <b>Name:</b> ${escapeHtml(name)}\n` +
-      `📞 <b>Phone:</b> ${escapeHtml(phone)}\n` +
-      `📍 <b>Address:</b> ${escapeHtml(address)}\n` +
-      `🔧 <b>Service:</b> ${escapeHtml(service)}\n` +
-      `📝 <b>Comment:</b> ${escapeHtml(comment || "-")}\n\n` +
-      `⏰ <b>Time:</b> ${escapeHtml(now)}`;
-
-    const tgRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    const hookRes = await fetch(MAKE_WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: "HTML" }),
+      body: JSON.stringify({
+        name,
+        phone,
+        address,
+        service,
+        comment: comment || "-",
+        time: now,
+      }),
     });
 
-    const tgData = await tgRes.json();
-    if (!tgRes.ok || !tgData.ok) {
-      console.error("Telegram error", tgData);
-      return new Response(JSON.stringify({ error: "Telegram delivery failed" }), {
+    if (!hookRes.ok) {
+      const errText = await hookRes.text().catch(() => "");
+      console.error("Make.com webhook error", hookRes.status, errText);
+      return new Response(JSON.stringify({ error: "Webhook delivery failed" }), {
         status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
