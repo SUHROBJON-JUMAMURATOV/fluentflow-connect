@@ -51,7 +51,18 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "Comment too long" }, 400);
     }
 
-    const time = new Date().toLocaleString("ru-RU", { timeZone: "Asia/Tashkent" });
+    const timeParts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Tashkent",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).formatToParts(new Date());
+    const part = (type: string) =>
+      timeParts.find((item) => item.type === type)?.value ?? "";
+    const time = `${part("day")}-${part("month")}-${part("year")} ${part("hour")}:${part("minute")}`;
     const safeComment = comment || "-";
     const subject = "🛠 YANGI BUYURTMA";
     const text = `${subject}\n\n👤 Ism: ${name}\n\n📞 Telefon: ${phone}\n\n📍 Manzil: ${address}\n\n🔧 Xizmat: ${service}\n\n📝 Izoh: ${safeComment}\n\n⏰ Vaqt: ${time}`;
@@ -71,12 +82,25 @@ Deno.serve(async (req) => {
       text,
       message: text,
       html,
+      Subject: subject,
+      Text: text,
+      Message: text,
+      "HTML content": html,
+      Ism: name,
+      Telefon: phone,
+      Manzil: address,
+      Xizmat: service,
+      Izoh: safeComment,
+      Vaqt: time,
     };
 
     const mkRes = await fetch(MAKE_WEBHOOK_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
-      body: new URLSearchParams(payload).toString(),
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8",
+        Accept: "application/json, text/plain, */*",
+      },
+      body: JSON.stringify(payload),
     });
 
     if (!mkRes.ok) {
