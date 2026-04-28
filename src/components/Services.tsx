@@ -1,4 +1,4 @@
-import { Droplets, Wrench, Pipette, ShowerHead } from "lucide-react";
+import { Droplets, Wrench, Pipette, ShowerHead, Toilet, Flame, WashingMachine, Thermometer } from "lucide-react";
 import { useLang } from "@/i18n/LanguageContext";
 
 export function Services() {
@@ -9,6 +9,10 @@ export function Services() {
     { key: "pipe" as const, Icon: Pipette },
     { key: "drain" as const, Icon: ShowerHead },
     { key: "leak" as const, Icon: Droplets },
+    { key: "toilet" as const, Icon: Toilet },
+    { key: "boiler" as const, Icon: Flame },
+    { key: "washer" as const, Icon: WashingMachine },
+    { key: "heating" as const, Icon: Thermometer },
   ];
 
   return (

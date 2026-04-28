@@ -16,9 +16,18 @@ import { toast } from "sonner";
 import { Loader2, Check, User, Phone, MapPin, MessageSquare, Wrench } from "lucide-react";
 
 type Status = "idle" | "submitting" | "success";
-type ServiceKey = "faucet" | "pipe" | "drain" | "leak";
+type ServiceKey = "faucet" | "pipe" | "drain" | "leak" | "toilet" | "boiler" | "washer" | "heating";
 
-const SERVICE_KEYS: ServiceKey[] = ["faucet", "pipe", "drain", "leak"];
+const SERVICE_KEYS: ServiceKey[] = [
+  "faucet",
+  "pipe",
+  "drain",
+  "leak",
+  "toilet",
+  "boiler",
+  "washer",
+  "heating",
+];
 
 export function OrderForm() {
   const { t } = useLang();

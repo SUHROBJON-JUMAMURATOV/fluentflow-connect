@@ -161,10 +161,20 @@ All colors MUST be HSL.
   0% { transform: scale(0.6); opacity: 0.6; }
   100% { transform: scale(2.4); opacity: 0; }
 }
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--success) / 0.45); }
+  50% { box-shadow: 0 0 0 10px hsl(var(--success) / 0); }
+}
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
 
 .animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
 .animate-fade-up { animation: fade-up 0.7s var(--transition-smooth) both; }
 .animate-scale-in { animation: scale-in 0.5s var(--transition-bounce) both; }
+.animate-pulse-glow { animation: pulse-glow 2.2s ease-out infinite; }
+.animate-gradient-x { animation: gradient-x 4s ease-in-out infinite; }
 
 /* Hide default spin on number input */
 input[type="number"]::-webkit-outer-spin-button,
