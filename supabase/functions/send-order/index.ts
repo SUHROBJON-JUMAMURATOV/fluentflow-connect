@@ -1,7 +1,7 @@
 const MAKE_WEBHOOK_URL =
   "https://hook.eu1.make.com/ctit5rl7r9bd9tpysfqubkx1k66vi641";
 const TELEGRAM_BOT_TOKEN = "8305847298:AAHobHyDKaUP8B1pJHODyQ6ez-sjffNQAZI";
-const TELEGRAM_CHAT_ID = "-3857437450";
+const TELEGRAM_CHAT_ID = "-1003857437450";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
