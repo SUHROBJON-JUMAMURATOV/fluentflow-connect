@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/i18n/LanguageContext";
-import { Phone, Sparkles } from "lucide-react";
+import { Phone, Sparkles, Clock } from "lucide-react";
 
 const PHONE_TEL = "+998200003916";
 
@@ -22,6 +22,15 @@ export function Hero() {
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
             <Sparkles className="h-3.5 w-3.5" />
             {t.hero.eyebrow}
+          </div>
+
+          <div className="mt-4 inline-flex items-center gap-2.5 rounded-full border border-success/30 bg-success/10 px-4 py-1.5 text-sm font-semibold text-success shadow-soft animate-pulse-glow">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success" />
+            </span>
+            <Clock className="h-4 w-4" />
+            <span>24/7 — {t.hero.badge247}</span>
           </div>
 
           <h1 className="mt-5 text-4xl font-bold tracking-tight text-balance sm:text-5xl lg:text-6xl">
