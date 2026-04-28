@@ -1,6 +1,9 @@
 const MAKE_WEBHOOK_URL =
   "https://hook.eu1.make.com/ctit5rl7r9bd9tpysfqubkx1k66vi641";
 
+const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN");
+const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID");
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -86,6 +89,26 @@ Deno.serve(async (req) => {
       Text: text,
       Message: text,
       "HTML content": html,
+      content: text,
+      body: text,
+      telegram_text: text,
+      plain_text: text,
+      order: {
+        name,
+        phone,
+        address,
+        service,
+        comment: safeComment,
+        time,
+      },
+      form: {
+        name,
+        phone,
+        address,
+        service,
+        comment: safeComment,
+        time,
+      },
       Ism: name,
       Telefon: phone,
       Manzil: address,
@@ -94,22 +117,50 @@ Deno.serve(async (req) => {
       Vaqt: time,
     };
 
-    const mkRes = await fetch(MAKE_WEBHOOK_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=UTF-8",
-        Accept: "application/json, text/plain, */*",
-      },
-      body: JSON.stringify(payload),
-    });
+    const deliveries = await Promise.allSettled([
+      fetch(MAKE_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          Accept: "application/json, text/plain, */*",
+        },
+        body: JSON.stringify(payload),
+      }),
+      TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID
+        ? fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json; charset=UTF-8" },
+            body: JSON.stringify({
+              chat_id: TELEGRAM_CHAT_ID,
+              text,
+              disable_web_page_preview: true,
+            }),
+          })
+        : Promise.resolve(new Response("Telegram secrets are not configured", { status: 204 })),
+    ]);
 
-    if (!mkRes.ok) {
-      const errText = await mkRes.text().catch(() => "");
-      console.error("Make.com webhook error", mkRes.status, errText);
-      return jsonResponse({ error: "Webhook delivery failed" }, 502);
+    const makeDelivery = deliveries[0];
+    const telegramDelivery = deliveries[1];
+    const makeOk = makeDelivery.status === "fulfilled" && makeDelivery.value.ok;
+    const telegramOk =
+      telegramDelivery.status === "fulfilled" && telegramDelivery.value.ok;
+
+    if (!makeOk) {
+      const status = makeDelivery.status === "fulfilled" ? makeDelivery.value.status : "network";
+      console.error("Make.com webhook delivery failed", status);
     }
 
-    return jsonResponse({ success: true });
+    if (!telegramOk && TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
+      const status =
+        telegramDelivery.status === "fulfilled" ? telegramDelivery.value.status : "network";
+      console.error("Telegram delivery failed", status);
+    }
+
+    if (!makeOk && !telegramOk) {
+      return jsonResponse({ error: "Order delivery failed" }, 502);
+    }
+
+    return jsonResponse({ success: true, make: makeOk, telegram: telegramOk });
   } catch (err) {
     console.error("send-order error:", err);
     return jsonResponse({ error: "Server error" }, 500);
