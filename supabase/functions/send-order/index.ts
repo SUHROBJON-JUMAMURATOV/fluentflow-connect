@@ -25,6 +25,37 @@ const escapeHtml = (value: string) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 
+const sendTelegramMessage = async (text: string) => {
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+    return new Response("Telegram secrets are not configured", { status: 204 });
+  }
+
+  const chatIds = TELEGRAM_CHAT_ID.trim().startsWith("-")
+    ? [TELEGRAM_CHAT_ID.trim()]
+    : [TELEGRAM_CHAT_ID.trim(), `-${TELEGRAM_CHAT_ID.trim()}`];
+
+  let lastResponse = new Response("Telegram chat not tried", { status: 400 });
+  for (const chatId of chatIds) {
+    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=UTF-8" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        disable_web_page_preview: true,
+      }),
+    });
+
+    if (response.ok) {
+      return response;
+    }
+
+    lastResponse = response;
+  }
+
+  return lastResponse;
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -126,17 +157,7 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify(payload),
       }),
-      TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID
-        ? fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json; charset=UTF-8" },
-            body: JSON.stringify({
-              chat_id: TELEGRAM_CHAT_ID,
-              text,
-              disable_web_page_preview: true,
-            }),
-          })
-        : Promise.resolve(new Response("Telegram secrets are not configured", { status: 204 })),
+      sendTelegramMessage(text),
     ]);
 
     const makeDelivery = deliveries[0];
