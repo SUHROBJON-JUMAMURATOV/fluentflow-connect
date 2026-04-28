@@ -50,6 +50,8 @@ const sendTelegramMessage = async (text: string) => {
       return response;
     }
 
+    const errBody = await response.clone().text().catch(() => "");
+    console.error("Telegram sendMessage failed", chatId, response.status, errBody);
     lastResponse = response;
   }
 
